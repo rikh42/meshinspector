@@ -25,26 +25,33 @@ func update_stats():
 	var node_transform: Transform3D = object.global_transform
 	if not mesh:
 		return
-
+	
+	# Convert PrimitiveMesh's into ArrayMesh's
+	var arr_mesh = ArrayMesh.new()
+	if mesh is PrimitiveMesh:
+		arr_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh.get_mesh_arrays())
+	else:
+		arr_mesh = mesh
+		
 	var vertex_total := 0
 	var face_total := 0
-	var surface_count := mesh.get_surface_count()
+	var surface_count: int = arr_mesh.get_surface_count()
 
 	for i in surface_count:
 		var mdt := MeshDataTool.new()
-		mdt.create_from_surface(mesh, i)
+		mdt.create_from_surface(arr_mesh, i)
 		vertex_total += mdt.get_vertex_count()
 		face_total += mdt.get_face_count()
-
+	
 	# Bounding box
-	var aabb := mesh.get_aabb()
-	var local_size := aabb.size.abs()
-	var local_volume := aabb.get_volume() if aabb.has_volume() else 0.0
+	var aabb: AABB = arr_mesh.get_aabb()
+	var local_size: Vector3 = aabb.size.abs()
+	var local_volume: float = aabb.get_volume() if aabb.has_volume() else 0.0
 
 	# bounding box after world transform applied
-	var world_aabb := node_transform * aabb if object is MeshInstance3D else aabb
-	var world_size := world_aabb.size.abs()
-	var world_volume := world_aabb.get_volume() if world_aabb.has_volume() else 0.0
+	var world_aabb: AABB = node_transform * aabb if object is MeshInstance3D else aabb
+	var world_size: Vector3 = world_aabb.size.abs()
+	var world_volume: float = world_aabb.get_volume() if world_aabb.has_volume() else 0.0
 
 	# Main section
 	var stats_fold = FoldableContainer.new()
