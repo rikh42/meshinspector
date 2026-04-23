@@ -18,18 +18,11 @@ func update_stats():
 	for child in main_container.get_children():
 		child.queue_free()
 
-	if not object:
+	if not object or not object is MeshInstance3D:
 		return
 
-	var mesh: Mesh = null
-	var node_transform := Transform3D.IDENTITY
-
-	if object is MeshInstance3D:
-		mesh = object.mesh
-		node_transform = object.global_transform
-	elif object is Mesh:
-		mesh = object
-
+	var mesh: Mesh = object.mesh
+	var node_transform: Transform3D = object.global_transform
 	if not mesh:
 		return
 
